@@ -1,0 +1,27 @@
+name: Verify solver
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Boundary and reconstruction tests
+        run: python -m unittest discover -s tests -v
+      - name: Edge-subset and random-instance verification
+        run: python verify.py --output results/verification-rerun.json
+      - name: All-threshold and independent recognition verification
+        run: python verify_thresholds.py --output results/thresholds-rerun.json
